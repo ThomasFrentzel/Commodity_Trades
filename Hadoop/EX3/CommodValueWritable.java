@@ -11,11 +11,9 @@ import java.util.Objects;
 public class CommodValueWritable
         implements WritableComparable<CommodValueWritable> {
 
-    // Atributos privados
     private double somaValores;
     private int qtd;
 
-    // Construtor vazio
     public CommodValueWritable() {
     }
 
@@ -24,8 +22,7 @@ public class CommodValueWritable
         this.qtd = qtd;
     }
 
-    // gets e sets de todos os atributos
-    public Double getSomaValores() {
+        public Double getSomaValores() {
         return somaValores;
     }
 
@@ -43,20 +40,17 @@ public class CommodValueWritable
 
     @Override
     public int compareTo(CommodValueWritable o) {
-        // manter essa implemementacao independentemente da classe e dos atributos
         return Integer.compare(o.hashCode(), this.hashCode());
     }
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-        // escrevendo em uma ordem desejada
         dataOutput.writeDouble(somaValores);
         dataOutput.writeInt(qtd);
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        // lendo na mesma ordem com que os dados foram escritos anteriormente
         somaValores = dataInput.readDouble();
         qtd = dataInput.readInt();
     }
