@@ -22,35 +22,27 @@ public class CommodityValues {
         Configuration c = new Configuration();
         String[] files = new GenericOptionsParser(c, args).getRemainingArgs();
 
-        // arquivo de entrada
         Path input = new Path(files[0]);
 
-        // arquivo de saida
         Path output = new Path(files[1]);
 
-        // criacao do job e seu nome
         Job j = new Job(c, "value");
 
-        // Registrar as classes
         j.setJarByClass(CommodityValues.class);
         j.setMapperClass(MapForAverage.class);
         j.setReducerClass(ReduceForAverage.class);
         j.setCombinerClass(CombineForAverage.class);
 
-        // Definir os tipos de saida
-        // MAP
+   
         j.setMapOutputKeyClass(Text.class);
         j.setMapOutputValueClass(CommodValueWritable.class);
 
-        // REDUCE
         j.setOutputKeyClass(Text.class);
         j.setOutputValueClass(DoubleWritable.class);
 
-        // Definir arquivos de entrada e de saida
         FileInputFormat.addInputPath(j, input);
         FileOutputFormat.setOutputPath(j, output);
 
-        // rodar
         j.waitForCompletion(false);
     }
 
@@ -59,23 +51,17 @@ public class CommodityValues {
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
 
-            // obtendo a linha
             String linha = value.toString();
 
-            // ignorando o cabeçalho
             if (!linha.startsWith("country_or_area;")) {
 
-                // quebrando em colunas
                 String colunas[] = linha.split(";");
 
-                // chave
                 String ano = colunas[1];
 
-                // valor
                 double valor = Double.parseDouble(colunas[5]);
                 int qtd = 1;
 
-                // enviando dados no formato (chave,valor) para o reduce
                 con.write(new Text(ano),
                         new CommodValueWritable(valor, qtd));
             }
@@ -86,14 +72,12 @@ public class CommodityValues {
         public void reduce(Text key, Iterable<CommodValueWritable> values, Context con)
                 throws IOException, InterruptedException {
 
-            // somar os valores e as quantidades
             double somaVals = 0;
             int somaQtds = 0;
             for(CommodValueWritable o : values){
                 somaVals += o.getSomaValores();
                 somaQtds += o.getQtd();
             }
-            // passando para o reduce valores pre-somados
             con.write(key, new CommodValueWritable(somaVals, somaQtds));
         }
     }
@@ -104,7 +88,6 @@ public class CommodityValues {
         public void reduce(Text key, Iterable<CommodValueWritable> values, Context con)
                 throws IOException, InterruptedException {
 
-            // somar os valores e as quantidades
             double somaVals = 0;
             int somaQtds = 0;
             for (CommodValueWritable o : values){
@@ -112,10 +95,8 @@ public class CommodityValues {
                 somaQtds += o.getQtd();
             }
 
-            // calcular a media
             double media = somaVals / somaQtds;
 
-            // para manter 5 linhas apenas no output
             if (count <= 4) {
                 con.write(key, new DoubleWritable(media));
                 count++;
