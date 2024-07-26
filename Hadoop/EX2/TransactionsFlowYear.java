@@ -23,34 +23,27 @@ public class TransactionsFlowYear {
 
         Configuration c = new Configuration();
         String[] files = new GenericOptionsParser(c, args).getRemainingArgs();
-        // arquivo de entrada
         Path input = new Path(files[0]);
 
-        // arquivo de saida
         Path output = new Path(files[1]);
 
-        // criacao do job e seu nome
         Job j = new Job(c, "flow_year");
 
-        // Registro de Classes
-        j.setJarByClass(TransactionsFlowYear.class); // classe que contem o método MAIN
-        j.setMapperClass(MapForFlowYear.class); // classe que contem o método MAP
-        j.setReducerClass(ReduceForFlowYear.class); // classe que contem o método REDUCE
+        j.setJarByClass(TransactionsFlowYear.class);
+        j.setMapperClass(MapForFlowYear.class);
+        j.setReducerClass(ReduceForFlowYear.class); 
 
-        j.setCombinerClass(CombineForFlowYear.class); // classe que contem o método COMBINER
+        j.setCombinerClass(CombineForFlowYear.class); 
 
-        // Definir os tipos de saída
-        j.setMapOutputKeyClass(FlowYearWritable.class); // tipo de chave de saída do MAP
-        j.setMapOutputValueClass(IntWritable.class); // tipo do valor de saída do MAP
+        j.setMapOutputKeyClass(FlowYearWritable.class); 
+        j.setMapOutputValueClass(IntWritable.class); 
 
-        j.setOutputKeyClass(FlowYearWritable.class); // tipo de chave de saida do REDUCE
-        j.setOutputValueClass(IntWritable.class); // tipo de valor de saída do REDUCE
+        j.setOutputKeyClass(FlowYearWritable.class);
+        j.setOutputValueClass(IntWritable.class); 
 
-        // Definindo arquivos de entrada e saída
         FileInputFormat.addInputPath(j, input);
         FileOutputFormat.setOutputPath(j, output);
 
-        // Executando a rotina
         j.waitForCompletion(false);
 
     }
@@ -60,20 +53,15 @@ public class TransactionsFlowYear {
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
 
-            // Covertendo a linha de entrada em uma string
             String linha = value.toString();
 
-            // ignorando o cabeçalho
             if (!linha.startsWith("country_or_area;")) {
 
-                /// quebrando em colunas
                 String colunas[] = linha.split(";");
 
-                // pegando as chaves
                 String ano = colunas[1];
                 String flow = colunas[4];
 
-                // chave, valor
                 FlowYearWritable keys = new FlowYearWritable(ano, flow);
                 IntWritable valor = new IntWritable(1);
 
@@ -92,12 +80,10 @@ public class TransactionsFlowYear {
 
             int cont = 0;
 
-            // contagem
             for (IntWritable v : values) {
                 cont += v.get();
             }
 
-            // para manter 5 linhas apenas no output
             if (count <= 4) {
                 con.write(key, new IntWritable(cont));
                 count++;
@@ -114,12 +100,10 @@ public class TransactionsFlowYear {
 
             int cont = 0;
 
-            // contagem
             for (IntWritable v : values) {
                 cont += v.get();
             }
 
-            // para manter 5 linhas apenas no output
             if (count <= 4) {
                 con.write(key, new IntWritable(cont));
                 count++;
