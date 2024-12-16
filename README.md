@@ -1,18 +1,87 @@
-# Commodity_Trades
- Big Data project using a global commodity trade dataset that contain transactions of the last 30 years.
- 
- ## Available Versions
- - Hadoop using Java
- - Apache Spark using Python
- - SparkSQL using Python and SQL
- 
- ## Queries:
- 
- 1) The number of transactions involving Brazil;
- 2) The number of transactions per flow type and year;
- 3) The average of commodity values per year;
- 4) The average price of commodities per unit type, year, and category in the export flow in Brazil;
- 5) The maximum, minimum, and mean transaction price per unit type and year;
- 6) The country with the largest average commodity price in the Export flow;
-    > Important: a single country must be output in this solution!
- 7) The most commercialized commodity (summing the quantities) in 2016, per flow type.
+# Commodity Trades - Big Data Project
+
+This project analyzes a global commodity trade dataset containing transactions over the past 30 years. The dataset is used to explore key insights into international trade, such as transaction counts, commodity price averages, and flow types across different countries.
+
+## Available Versions
+- **Hadoop (Java)**: Distributed processing using Hadoop MapReduce.
+- **Apache Spark (Python)**: Fast, in-memory processing using Apache Spark.
+- **SparkSQL (Python & SQL)**: SQL-based querying using Apache Spark for efficient data analysis.
+
+## Dataset Source
+The dataset used in this project can be downloaded from the following link:
+[Download the dataset](https://jpbarddal.github.io/assets/data/bigdata/transactions_amostra.csv.zip)
+
+## Dataset Overview:
+- Contains transactions over the last 30 years.
+- Data includes commodity details, transaction flow types, quantities, values, and related information.
+
+## Key Queries
+The project addresses several important questions regarding the global commodity trade:
+
+1. **Total Transactions Involving Brazil**  
+   Count the total number of commodity trade transactions where Brazil is involved.
+   
+2. **Transactions by Flow Type and Year**  
+   Group transactions by flow type and year to identify trends over time.
+   
+3. **Average Commodity Value Per Year**  
+   Calculate the average commodity price for each year.
+   
+4. **Average Commodity Price per Unit Type, Year, and Category in Export Flow (Brazil)**  
+   Calculate the average price of commodities per unit type, year, and category for export transactions involving Brazil.
+   
+5. **Max, Min, and Mean Transaction Prices Per Unit Type and Year**  
+   Compute the maximum, minimum, and mean transaction price for each unit type by year.
+   
+6. **Country with Largest Average Commodity Price in Export Flow**  
+   Identify the country with the highest average commodity price in the export flow.
+   
+7. **Most Commercialized Commodity in 2016 by Flow Type**  
+   Identify the most traded commodity (by quantity) in 2016, broken down by flow type.
+
+## Project Setup
+
+### Prerequisites
+Ensure that you have the following tools installed:
+- Hadoop (Java) or Apache Spark with Python
+- Java Development Kit (JDK) for Hadoop or Python for Spark
+- Apache Maven for managing dependencies (if using Hadoop)
+- PySpark for running the Spark queries in Python
+- Jupyter Notebook for running SparkSQL queries in Python
+
+### Setup Instructions
+
+#### Hadoop Setup:
+1. **Download and extract the dataset:**
+    ```bash
+    wget https://jpbarddal.github.io/assets/data/bigdata/transactions_amostra.csv.zip
+    unzip transactions_amostra.csv.zip
+    ```
+
+2. **Compile the Java code and submit the job to Hadoop:**
+    ```bash
+    mvn clean package
+    hadoop jar target/your-jar-file.jar EX4.YourMainClass /input /output
+    ```
+
+#### Spark Setup (Python):
+1. **Download and unzip the dataset:**
+    ```bash
+    wget https://jpbarddal.github.io/assets/data/bigdata/transactions_amostra.csv.zip
+    unzip transactions_amostra.csv.zip
+    ```
+
+2. **Install required dependencies:**
+    ```bash
+    pip install pyspark
+    ```
+
+3. **Run the Spark queries using the provided Python scripts.**
+
+#### SparkSQL Setup (Python & SQL):
+1. **Set up SparkSQL and load the dataset:**
+    ```bash
+    spark.sql("CREATE TABLE commodity_data USING csv OPTIONS (path 'transactions_amostra.csv', header 'true', inferSchema 'true')")
+    ```
+
+2. **Execute SQL queries directly in SparkSQL.**
