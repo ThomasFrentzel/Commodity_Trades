@@ -21,15 +21,12 @@ public class LargestAveragePrice {
 
         Configuration c = new Configuration();
         String[] files = new GenericOptionsParser(c, args).getRemainingArgs();
-        // arquivo de entrada
         Path input = new Path(files[0]);
 
         Path intermediate = new Path("./output/ex6.tmp");
 
-        // arquivo de saida
         Path output = new Path(files[1]);
 
-        // Criando o primeiro job
         Job j1 = new Job(c, "average1");
         j1.setJarByClass(LargestAveragePrice.class);
         j1.setMapperClass(MapEtapaA.class);
@@ -43,10 +40,8 @@ public class LargestAveragePrice {
         FileInputFormat.addInputPath(j1, input);
         FileOutputFormat.setOutputPath(j1, intermediate);
 
-        // Rodo o job 1
         j1.waitForCompletion(false);
 
-        // Configuracao do job 2
         Job j2 = new Job(c, "average2");
         j2.setJarByClass(LargestAveragePrice.class);
         j2.setMapperClass(MapEtapaB.class);
@@ -70,29 +65,23 @@ public class LargestAveragePrice {
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
 
-            // obtendo a linha
             String linha = value.toString();
 
-            // ignorando o cabeçalho
             if (!linha.startsWith("country_or_area;")) {
 
                 String colunas[] = linha.split(";");
 
                 String flow = colunas[4];
 
-                // checando se o flow é Export
                 if (flow.equals("Export")) {
 
-                    // chave
                     String pais = colunas[0];
 
-                    // valor
                     double valor = Double.parseDouble(colunas[5]);
                     int qtd = 1;
 
                     LargestAveragePriceValueWritable valores = new LargestAveragePriceValueWritable(valor, qtd);
 
-                    // chave e valor
                     con.write(new Text(pais), valores);
                 }
                 }
@@ -107,13 +96,11 @@ public class LargestAveragePrice {
             double somaVals = 0.0;
             int somaQtds = 0;
 
-            // somando os valores e as qtds
             for (LargestAveragePriceValueWritable o : values) {
                 somaVals += o.getSomaValores();
                 somaQtds += o.getQtd();
             }
 
-            // mandando para o reduce os valores pré-somados
             con.write(key, new LargestAveragePriceValueWritable(somaVals, somaQtds));
 
         }
@@ -126,16 +113,13 @@ public class LargestAveragePrice {
             double somaVals = 0.0;
             int somaQtds = 0;
 
-            // somando os valores e as qtds
             for (LargestAveragePriceValueWritable o : values) {
                 somaVals += o.getSomaValores();
                 somaQtds += o.getQtd();
             }
 
-            // calculando a media
             double media = somaVals / somaQtds;
 
-            // chave e valor
             con.write(key, new DoubleWritable(media));
         }
     }
@@ -145,17 +129,13 @@ public class LargestAveragePrice {
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
 
-            // Pegando uma linha
             String linha = value.toString();
 
-            // quebrando a linha por tabs
             String linhas[] = linha.split("\t");
 
-            // valor
             String pais = linhas[0];
             double qtd = Double.parseDouble(linhas[1]);
 
-            // chave
             Text chave = new Text("País com maior média: ");
 
             LargestAveragePriceValue2Writable valor = new LargestAveragePriceValue2Writable(pais, qtd);
@@ -172,8 +152,6 @@ public class LargestAveragePrice {
             double largest = 0.0;
             String pais = "";
 
-            // verificando qual país possui o maior valor
-            // salvando o nome e o valor que cada país apresentou
             for (LargestAveragePriceValue2Writable o : values) {
                 if (o.getQtd() > largest) {
                     largest = o.getQtd();
@@ -181,7 +159,6 @@ public class LargestAveragePrice {
                 }
             }
 
-            // chave e valor
             Text chave = new Text(key);
             LargestAveragePriceValue2Writable valores = new LargestAveragePriceValue2Writable(pais, largest);
 
@@ -197,8 +174,7 @@ public class LargestAveragePrice {
             double largest = 0.0;
             String pais = "";
 
-            // verificando qual país possui o maior valor
-            // salvando o nome e o valor que cada país apresentou
+
             for (LargestAveragePriceValue2Writable o : values) {
                 if (o.getQtd() > largest) {
                     largest = o.getQtd();
@@ -206,7 +182,7 @@ public class LargestAveragePrice {
                 }
             }
 
-            // chave e valor
+
             Text chave = new Text(key);
             LargestAveragePriceValue2Writable valores = new LargestAveragePriceValue2Writable(pais, largest);
 
