@@ -21,15 +21,12 @@ public class CommercializedCommodity {
         Configuration c = new Configuration();
         String[] files = new GenericOptionsParser(c, args).getRemainingArgs();
 
-        // arquivo de entrada
         Path input = new Path(files[0]);
 
         Path intermediate = new Path("./output/ex7.tmp");
 
-        // arquivo de saida
         Path output = new Path(files[1]);
 
-        // Criando o primeiro job
         Job j1 = new Job(c, "commodity1");
         j1.setJarByClass(CommercializedCommodity.class);
         j1.setMapperClass(MapEtapaA.class);
@@ -43,10 +40,8 @@ public class CommercializedCommodity {
         FileInputFormat.addInputPath(j1, input);
         FileOutputFormat.setOutputPath(j1, intermediate);
 
-        // Rodo o job 1
         j1.waitForCompletion(false);
 
-        // Configuracao do job 2
         Job j2 = new Job(c, "commodity2");
         j2.setJarByClass(CommercializedCommodity.class);
         j2.setMapperClass(MapEtapaB.class);
@@ -70,24 +65,19 @@ public class CommercializedCommodity {
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
 
-            // Obtendo a linha
             String linha = value.toString();
 
-            // ignorando o cabeçalho
             if (!linha.startsWith("country_or_area;")) {
 
                 String colunas[] = linha.split(";");
 
                 String ano = colunas[1];
 
-                // checando se o ano é 2016
                 if (ano.equals("2016")) {
 
-                    // chave
                     String flow = colunas[4];
                     String commodity = colunas[3];
 
-                    // valor
                     double amount = Double.parseDouble(colunas[8]);
 
                     CommercializedCommodityKeyWritable chaves = new CommercializedCommodityKeyWritable(flow, commodity);
@@ -105,12 +95,10 @@ public class CommercializedCommodity {
 
             double sum = 0.0;
 
-            // somando a quantidade
             for (DoubleWritable d : values) {
                 sum += d.get();
             }
 
-            // escrevendo o arquivo de resultados
             con.write(key, new DoubleWritable(sum));
         }
     }
@@ -121,12 +109,10 @@ public class CommercializedCommodity {
 
             double sum = 0.0;
 
-            // somando a quantidade
             for (DoubleWritable d : values) {
                 sum += d.get();
             }
 
-            // escrevendo o arquivo de resultados
             con.write(key, new DoubleWritable(sum));
         }
     }
@@ -136,16 +122,13 @@ public class CommercializedCommodity {
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
 
-            // Pegando uma linha
             String linha = value.toString();
 
-            // quebrando a linha por tabs
             String linhas[] = linha.split("\t");
 
-            // chave
             String flow = linhas[0];
 
-            // valor
+   
             String commodity = linhas[1];
             double qtd = Double.parseDouble(linhas[2]);
 
@@ -164,8 +147,7 @@ public class CommercializedCommodity {
             double largest = 0.0;
             String commodity = "";
 
-            // verificando qual commodity tem o maior valor
-            // salvando o nome e o valor de cada commodity
+
             for (CommercializedCommodityValueWritable c : values) {
                 if (c.getQtd() > largest) {
                     largest = c.getQtd();
@@ -186,8 +168,7 @@ public class CommercializedCommodity {
             double largest = 0.0;
             String commodity = "";
 
-            // verificando qual commodity tem o maior valor
-            // salvando o nome e o valor de cada commodity
+
             for (CommercializedCommodityValueWritable c : values) {
                 if (c.getQtd() > largest) {
                     largest = c.getQtd();
