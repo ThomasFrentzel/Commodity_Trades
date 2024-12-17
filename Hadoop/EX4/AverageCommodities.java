@@ -27,36 +27,28 @@ public class AverageCommodities {
         Configuration c = new Configuration();
         String[] files = new GenericOptionsParser(c, args).getRemainingArgs();
 
-        // arquivo de entrada
         Path input = new Path(files[0]);
 
-        // arquivo de saida
         Path output = new Path(files[1]);
 
-        // criacao do job e seu nome
         Job j = new Job(c, "averageCommodity");
 
-        // Registrar as classes
         j.setJarByClass(AverageCommodities.class);
         j.setMapperClass(MapForAverageCommodities.class);
         j.setReducerClass(ReduceForAverageCommodities.class);
 
         j.setCombinerClass(CombineForAverageCommodities.class);
 
-        // Definir os tipos de saida
-        // MAP
+  
         j.setMapOutputKeyClass(AverageCommodityKeyWritable.class);
         j.setMapOutputValueClass(AverageCommodityValueWritable.class);
 
-        // REDUCE
         j.setOutputKeyClass(AverageCommodityKeyWritable.class);
         j.setOutputValueClass(DoubleWritable.class);
 
-        // Definir arquivos de entrada e de saida
         FileInputFormat.addInputPath(j, input);
         FileOutputFormat.setOutputPath(j, output);
 
-        // rodar :)
         j.waitForCompletion(false);
     }
 
@@ -65,35 +57,26 @@ public class AverageCommodities {
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
 
-            // obtendo a linha
             String linha = value.toString();
 
-            // ignorando o cabeçalho
             if (!linha.startsWith("country_or_area;")) {
 
-                // quebrando em colunas
                 String colunas[] = linha.split(";");
 
-                // obtendo as chaves
                 String pais = colunas[0];
                 String flow = colunas[4];
 
-                // verificando se o país é Brazil
                 if (pais.equals("Brazil")) {
 
-                    // verificando se o flow é Export
                     if (flow.equals("Export")) {
 
-                        // chaves
                         String ano = colunas[1];
                         String unitType = colunas[7];
                         String categoria = colunas[9];
 
-                        // valores
                         double valor = Double.parseDouble(colunas[5]);
                         int qtd = 1;
 
-                        // chave, valor
                         AverageCommodityKeyWritable chaves = new AverageCommodityKeyWritable(ano, unitType, categoria);
                         AverageCommodityValueWritable valores = new AverageCommodityValueWritable(valor, qtd);
 
@@ -109,7 +92,6 @@ public class AverageCommodities {
         public void reduce(AverageCommodityKeyWritable key, Iterable<AverageCommodityValueWritable> values, Context con)
                 throws IOException, InterruptedException {
 
-            // somar os valores e as qtds
             double somaVals = 0.0;
             int somaQtds = 0;
             for(AverageCommodityValueWritable o : values){
@@ -117,7 +99,6 @@ public class AverageCommodities {
                 somaQtds += o.getQtd();
             }
 
-            // passando para o reduce valores pre-somados
             con.write(key, new AverageCommodityValueWritable(somaVals, somaQtds));
         }
     }
@@ -128,7 +109,6 @@ public class AverageCommodities {
         public void reduce(AverageCommodityKeyWritable key, Iterable<AverageCommodityValueWritable> values, Context con)
                 throws IOException, InterruptedException {
 
-            // somar os valores e as qtds
             double somaVals = 0.0;
             int somaQtds = 0;
             for (AverageCommodityValueWritable o : values){
@@ -136,10 +116,8 @@ public class AverageCommodities {
                 somaQtds += o.getQtd();
             }
 
-            // calcular a media
             double media = somaVals / somaQtds;
 
-            // para manter 5 linhas apenas no output
             if (count <= 4) {
                 con.write(key, new DoubleWritable(media));
                 count++;
