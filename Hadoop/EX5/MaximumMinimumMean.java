@@ -25,35 +25,26 @@ public class MaximumMinimumMean {
         Configuration c = new Configuration();
         String[] files = new GenericOptionsParser(c, args).getRemainingArgs();
 
-        // arquivo de entrada
         Path input = new Path(files[0]);
 
-        // arquivo de saida
         Path output = new Path(files[1]);
 
-        // criacao do job e seu nome
         Job j = new Job(c, "MaximumMinimumMean");
 
-        // Registrar as classes
         j.setJarByClass(MaximumMinimumMean.class);
         j.setMapperClass(MapForMaximumMinimumMean.class);
         j.setReducerClass(ReduceForMaximumMinimumMean.class);
         j.setCombinerClass(CombineForMaximumMinimumMean.class);
 
-        // Definir os tipos de saida
-        // MAP
         j.setMapOutputKeyClass(MaximumMinimumMeanKeyWritable.class);
         j.setMapOutputValueClass(MaximumMinimumMeanValueWritable.class);
 
-        // REDUCE
         j.setOutputKeyClass(MaximumMinimumMeanKeyWritable.class);
         j.setOutputValueClass(MaximumMinimumMeanValue2Writable.class);
 
-        // Definir arquivos de entrada e de saida
         FileInputFormat.addInputPath(j, input);
         FileOutputFormat.setOutputPath(j, output);
 
-        // rodar :)
         j.waitForCompletion(false);
     }
 
@@ -62,26 +53,20 @@ public class MaximumMinimumMean {
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
 
-            // obtendo a linha
             String linha = value.toString();
 
-            // ignorando o cabeçalho
             if (!linha.startsWith("country_or_area;")) {
 
-                // quebrando em colunas
                 String colunas[] = linha.split(";");
 
-                // chave
                 String ano = colunas[1];
                 String unitType = colunas[7];
 
-                // valor
                 double valorMax = Double.parseDouble(colunas[5]);
                 double valorMin = Double.parseDouble(colunas[5]);
                 double valor = Double.parseDouble(colunas[5]);
                 int qtd = 1;
 
-                // chave, valor
                 MaximumMinimumMeanKeyWritable chaves = new MaximumMinimumMeanKeyWritable(ano, unitType);
                 MaximumMinimumMeanValueWritable valores = new MaximumMinimumMeanValueWritable(valorMax, valorMin, valor, qtd);
 
@@ -99,8 +84,7 @@ public class MaximumMinimumMean {
             double somaVals = 0;
             int somaQtds = 0;
 
-            // somar os valores e as qtds
-            // obter os valores máximos e mínimos
+
             for (MaximumMinimumMeanValueWritable j : values) {
                 somaVals += j.getSomaValores();
                 somaQtds += j.getQtd();
@@ -129,8 +113,6 @@ public class MaximumMinimumMean {
             double somaVals = 0;
             int somaQtds = 0;
 
-            // somar os valores e as qtds
-            // obter os valores máximos e mínimos
             for (MaximumMinimumMeanValueWritable j : values) {
                 somaVals += j.getSomaValores();
                 somaQtds += j.getQtd();
@@ -143,10 +125,8 @@ public class MaximumMinimumMean {
                 }
             }
 
-            // calcular a media
             double media = somaVals / somaQtds;
 
-            // para manter 5 linhas apenas no output
             if (count <= 4) {
                 con.write(key, new MaximumMinimumMeanValue2Writable(max, min, media));
                 count++;
