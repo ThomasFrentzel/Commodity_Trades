@@ -79,9 +79,15 @@ Ensure that you have the following tools installed:
 3. **Run the Spark queries using the provided Python scripts.**
 
 #### SparkSQL Setup (Python & SQL):
-1. **Set up SparkSQL and load the dataset:**
+1. **Download and unzip the dataset:**
     ```bash
-    spark.sql("CREATE TABLE commodity_data USING csv OPTIONS (path 'transactions_amostra.csv', header 'true', inferSchema 'true')")
+    wget https://jpbarddal.github.io/assets/data/bigdata/transactions_amostra.csv.zip
+    unzip transactions_amostra.csv.zip
     ```
 
-2. **Execute SQL queries directly in SparkSQL.**
+2. **Install required dependencies:**
+    ```bash
+    pip install pyspark
+    ```
+    
+3. **Execute SQL queries directly in SparkSQL.**
