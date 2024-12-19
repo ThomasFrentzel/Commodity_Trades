@@ -49,9 +49,9 @@ Ensure that you have the following tools installed:
 - PySpark for running the Spark queries in Python
 - Jupyter Notebook for running SparkSQL queries in Python
 
-## Cloning the Repository
-
+### Clone the Repository
+Clone the repository using the following command:
 ```bash
 git clone https://github.com/ThomasFrentzel/Commodity_Trades
-
+```
 
