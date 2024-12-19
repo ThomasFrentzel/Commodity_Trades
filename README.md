@@ -48,3 +48,10 @@ Ensure that you have the following tools installed:
 - Apache Maven for managing dependencies (if using Hadoop)
 - PySpark for running the Spark queries in Python
 - Jupyter Notebook for running SparkSQL queries in Python
+
+## Cloning the Repository
+
+```bash
+git clone https://github.com/ThomasFrentzel/Commodity_Trades
+
+
